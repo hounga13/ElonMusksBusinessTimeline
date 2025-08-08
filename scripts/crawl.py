@@ -13,7 +13,7 @@ ALLOW_LIST = {
 # 크롤링 함수 (예시: Twitter API 사용 가정)
 def crawl_data(category):
     url = f"https://api.twitter.com/2/users/by/username/{ALLOW_LIST[category][0]}/tweets"  # API 엔드포인트 예시
-    headers = {"Authorization": "Bearer YOUR_API_TOKEN"}  # API 토큰 필요
+    headers = {"Authorization": "Bearer AAAAAAAAAAAAAAAAAAAAAG3y3QEAAAAAW9KxWWMrKkL2ZQK%2FrGlrf%2FvOW60%3DOwild7NSktVkdu06EOauQHEwMOCRuvkGJrGiEfiqS3RLTB49F6"}  # API 토큰 필요
     response = requests.get(url, headers=headers)
     data = response.json()
 
