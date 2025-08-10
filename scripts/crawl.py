@@ -12,6 +12,7 @@ ALLOW_LIST = {
 }
 
 # Twitter API 토큰 가져오기 (GitHub Secrets에서)
+print("TWITTER_API_TOKEN:", os.environ.get("TWITTER_API_TOKEN"))
 TWITTER_API_TOKEN = os.environ.get("TWITTER_API_TOKEN")
 if not TWITTER_API_TOKEN:
     raise ValueError("TWITTER_API_TOKEN environment variable is not set.")
