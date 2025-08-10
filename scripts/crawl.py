@@ -23,7 +23,7 @@ if not TWITTER_API_TOKEN:
 # 크롤링 함수 (Twitter API 사용 가정)
 def crawl_data(category):
     print(f"Starting crawl for {category} with token: ***")  # 토큰 마스킹
-    url = f"https://api.twitter.com/2/users/by/username/{ALLOW_LIST[category][0]}/tweets"
+    url = f"https://api.twitter.com/2/users/{get_user_id(ALLOW_LIST[category][0])}/tweets"
     headers = {
         "Authorization": f"Bearer {TWITTER_API_TOKEN}"
     }
