@@ -2,7 +2,7 @@ name: Update Cache
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 자정 (UTC 기준, KST는 +9시간)
+    - cron: '0 0 * * *'  # 매일 자정 (UTC), KST는 오전 9시
   workflow_dispatch:      # 수동 트리거 가능
 
 jobs:
@@ -24,6 +24,8 @@ jobs:
 
       - name: Run crawling script
         run: python scripts/crawl.py
+        env:
+          TWITTER_API_TOKEN: ${{ secrets.TWITTER_API_TOKEN }}
 
       - name: Commit and push changes
         run: |
