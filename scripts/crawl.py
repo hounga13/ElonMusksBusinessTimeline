@@ -20,15 +20,33 @@ print("TWITTER_API_TOKEN after get:", TWITTER_API_TOKEN)  # 디버깅 추가
 if not TWITTER_API_TOKEN:
     raise ValueError("TWITTER_API_TOKEN environment variable is not set.")
 
-# 크롤링 함수 (Twitter API 사용 가정)
-def crawl_data(category):
-    print(f"Starting crawl for {category} with token: ***")  # 토큰 마스킹
-    url = f"https://api.twitter.com/2/users/{get_user_id(ALLOW_LIST[category][0])}/tweets"
+# 사용자 ID를 가져오는 함수
+def get_user_id(username):
+    url = f"https://api.twitter.com/2/users/by/username/{username[1:]}"
     headers = {
         "Authorization": f"Bearer {TWITTER_API_TOKEN}"
     }
-    print(f"Request URL: {url}")  # 요청 URL 로그
     response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        return data["data"][0]["id"]  # 사용자 ID 반환
+    else:
+        raise Exception(f"Failed to get user ID for {username}: {response.text}")
+
+# 크롤링 함수 (Twitter API 사용)
+def crawl_data(category):
+    print(f"Starting crawl for {category} with token: ***")  # 토큰 마스킹
+    user_id = get_user_id(ALLOW_LIST[category][0])
+    url = f"https://api.twitter.com/2/users/{user_id}/tweets"
+    headers = {
+        "Authorization": f"Bearer {TWITTER_API_TOKEN}"
+    }
+    params = {
+        "max_results": 10,  # 무료 티어 제한 내에서 최대 10개 트윗
+        "tweet.fields": "created_at,public_metrics,attachments"  # 필요한 필드 지정
+    }
+    print(f"Request URL: {url} with params: {params}")  # 요청 URL 로그
+    response = requests.get(url, headers=headers, params=params)
     
     if response.status_code != 200:
         raise Exception(f"Failed to fetch data for {category}: {response.text}")
@@ -41,11 +59,11 @@ def crawl_data(category):
         items.append({
             "title": tweet.get("text", "").split("\n")[0][:50],
             "summary": tweet.get("text", "")[:200],
-            "link": f"https://twitter.com/{ALLOW_LIST[category][0]}/status/{tweet['id']}",
+            "link": f"https://twitter.com/{ALLOW_LIST[category][0][1:]}/status/{tweet['id']}",
             "timestamp": tweet.get("created_at", datetime.utcnow().isoformat() + "Z"),
             "likes": tweet.get("public_metrics", {}).get("like_count", 0),
             "views": tweet.get("public_metrics", {}).get("impression_count", 0),
-            "thumbnail_url": tweet.get("attachments", {}).get("media_keys", ["https://example.com/default-thumb.jpg"])[0]
+            "thumbnail_url": "https://example.com/default-thumb.jpg"  # 미디어 키 기반 썸네일 추가 필요
         })
 
     with open(f"data/{category}.json", "w", encoding="utf-8") as f:
